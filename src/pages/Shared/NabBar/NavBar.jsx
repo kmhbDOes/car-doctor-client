@@ -40,14 +40,16 @@ const NavBar = () => {
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost normal-case text-xl">
-          <img src={logo} alt="" />
+          <img className="h-16 ml-12 md:ml-0" src={logo} alt="" />
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{navItems}</ul>
       </div>
       <div className="navbar-end">
-        <button className="btn btn-outline btn-warning">Appointment</button>
+        <button className="btn btn-outline btn-warning w-28 md:w-36">
+          Appointment
+        </button>
       </div>
     </div>
   );
