@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import {
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   getAuth,
-  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const googleProvider = new GoogleAuthProvider();
+
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
@@ -36,17 +37,17 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signOut(auth);
   };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log("Current User in auth provider:", currentUser);
+      console.log("current user in auth Provider", currentUser);
       setLoading(false);
-
       if (currentUser && currentUser.email) {
         const loggedUser = {
           email: currentUser.email,
         };
-        fetch("http://localhost:5000/jwt", {
+        fetch("https://car-doctor-server-pi-three.vercel.app/jwt", {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -56,18 +57,27 @@ const AuthProvider = ({ children }) => {
           .then((res) => res.json())
           .then((data) => {
             console.log("jwt response", data);
-
-            // Warning: Worst practice to set jwt in local storage
+            // Warning: Local storage is not the best (second best place) to store access token
             localStorage.setItem("car-access-token", data.token);
-            // navigate(from, { replace: true });
           });
       } else {
         localStorage.removeItem("car-access-token");
       }
     });
-    return () => unsubscribe();
+    return () => {
+      return unsubscribe();
+    };
   }, []);
-  const authInfo = { user, loading, createUser, signIn, googleSignIn, logOut };
+
+  const authInfo = {
+    user,
+    loading,
+    createUser,
+    signIn,
+    googleSignIn,
+    logOut,
+  };
+
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   );
